@@ -143,7 +143,7 @@ app.layout = dbc.Container(
                 ),
                 html.P(
                     [
-                        "Aquest projecte presenta una anàlisi exploratòri del mercat dels videojocs a partir del catàleg de la plataforma Steam. "
+                        "Aquest projecte presenta una anàlisi exploratòria del mercat dels videojocs a partir del catàleg de la plataforma Steam. "
                         "L'objectiu és examinar quins factors contribueixen a diferenciar els títols "
                         "dins d'un ecosistema especialment competitiu.",
                         html.Br(),
@@ -163,8 +163,8 @@ app.layout = dbc.Container(
             style=SECTION,
             children=[
                 html.P(
-                    "El dataset que tractarem a continuació inclou més de 130.000 jocs publicats a la plataforma de ventes de videojocs de la companyia Valve "
-                    " anomenada Steam entre els anys 2003 i 2024 que ofereix ofereix una àmplia varietat de gèneres i preus. "
+                    "El dataset que tractarem a continuació inclou més de 100.000 jocs publicats a la plataforma de vendes de videojocs de la companyia Valve "
+                    " anomenada Steam, que ofereix una àmplia varietat de gèneres i preus. "
                     "Aquesta diversitat permet explorar com es distribueixen diferents "
                     "característiques al llarg del catàleg i com aquestes poden influir en la percepció dels usuaris.",
                     style={**TEXT_FONT},
@@ -196,7 +196,7 @@ app.layout = dbc.Container(
                         html.Strong("Indie", style={"color": ACCENT}),
                         ", amb més de 80.000 títols publicats. ",
                         "Tanmateix, que hi hagi un gran volum d'exemplars d'un gènere en concret no implica necessàriament que aquest sigui el més popular o el millor valorat. "
-                        "De fet, quan ordenem per nombre de ventes, el lideratge passa a correspondre a ",
+                        "De fet, quan ordenem per nombre de vendes, el lideratge passa a correspondre a ",
                         html.Strong("Action", style={"color": ACCENT}),
                         ", malgrat disposar inicialment d'un volum d'oferta inferior al d'Indie. ",
                     ],
@@ -219,7 +219,7 @@ app.layout = dbc.Container(
             children=[
                 html.P(
                     [
-                        "Per altre banda, un aspecte rellevant que se sol associar amb bona qualitat és el preu. "
+                        "Per altra banda, un aspecte rellevant que se sol associar amb bona qualitat és el preu. "
                         "Culturalment, les persones associen sovint un preu elevat amb una qualitat superior. "
                         "Per tal de verificar si aquesta associació es manté en el cas dels videojocs de Steam, "
                         "es pot examinar la relació entre el preu i la satisfacció dels usuaris de cadascun dels registres del dataset. "
@@ -257,13 +257,13 @@ app.layout = dbc.Container(
                         "rebut el joc. Com més gran el cercle, més recomanacions ha rebut.",
                         html.Br(),
                         html.Br(),
-                        "Aquí observem que hi han pics alts de nombre de jugadors en diversos jocs però que no tots han presentat una alta satisfacció "
+                        "Aquí observem que hi ha pics alts de nombre de jugadors en diversos jocs però que no tots han presentat una alta satisfacció "
                         "per moltes recomanacions que hagin tingut o nombre de jugadors simultanis. A mesura que augmenta el nombre de jugadors actius, "
-                        "si que es denota que els jugadors recomanen el joc cada cop més, però no sembla que hi hagi una relació directa. S'observen alguns "
-                        "casos en que hi que la recomanació i nombre de jugadors mostra una associació però també d'altres com ",
+                        "sí que es denota que els jugadors recomanen el joc cada cop més, però no sembla que hi hagi una relació directa. S'observen alguns "
+                        "casos en què la recomanació i el nombre de jugadors mostren una associació, però també d'altres com ",
                         html.Strong("PUBG", style={"color": ACCENT}),
                         " que té molts jugadors però poca satisfacció i ",
-                        html.Strong("Dota 2", style={"color": ACCENT}),
+                        html.Strong("DELTARUNE", style={"color": ACCENT}),
                         " que té poca recomanació però molts jugadors satisfets."
                     ],
                     style={**TEXT_FONT},
@@ -293,7 +293,7 @@ app.layout = dbc.Container(
                         "- Decebedor: jocs amb gran volum de jugadors però baixa satisfacció.",
                         html.Br(),
                         html.Br(),
-                        "De forma clara es visualitza aquells jocs que han aconseguit destacar respecte la resta i aquells que"
+                        "De forma clara es visualitzen aquells jocs que han aconseguit destacar respecte la resta i aquells que"
                         ", tot i ser bons, ho podrien haver fet millor.",
                         html.Br(),
                         html.Br(),
@@ -308,7 +308,7 @@ app.layout = dbc.Container(
                     children=[
                         dbc.Col(
                             [
-                                html.Label("Jugadors concurrents mínim:", style={"color": TEXT, "fontSize": "0.9rem"}),
+                                html.Label("Jugadors concurrents mínims:", style={"color": TEXT, "fontSize": "0.9rem"}),
                                 dcc.Slider(
                                     id="profile-ccu-min",
                                     min=100,
@@ -369,7 +369,7 @@ app.layout = dbc.Container(
                             [
                                 conclusion_card(
                                     "Paradoxa de la popularitat",
-                                    "Els jocs amb valors molt elevats de Peak CCU no sempre superen el 90% de satisfacció, "
+                                    "Els jocs amb valors molt elevats de jugadors concurrents no sempre superen el 90% de satisfacció, "
                                     "fet que apunta a una relació imperfecta entre abast massiu i valoració.",
                                 ),
                                 conclusion_card(

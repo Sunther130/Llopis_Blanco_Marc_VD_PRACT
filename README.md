@@ -1,5 +1,5 @@
 # M2.959 - Visualització de dades
-## PRACTICA - Projecte de visualització
+## PRÀCTICA - Projecte de visualització
 
 Alumne/a: Marc Llopis I Blanco
 
@@ -37,9 +37,9 @@ Per a poder executar el notebook de la pràctica, és necessari seguir els segü
 
 1. Crear i activar un entorn virtual:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate        # Linux / macOS
-   venv/Scripts/activate           # Windows
+   python3 -m venv .venv
+   source .venv/bin/activate        # Linux / macOS
+   .venv/Scripts/activate           # Windows
    ```
 
 2. Instal·lar dependències:
@@ -65,7 +65,7 @@ Per a poder executar el notebook de la pràctica, és necessari seguir els segü
    ```
 
 
-## Referencies
+## Referències
 
 - Antoine Pitrou (2026) *pathlib* (Versió 3.4.0) https://docs.python.org/3/library/pathlib.html
 - Harris, C.R., Millman, K.J., van der Walt, S.J. et al. *Array programming with NumPy*. Nature 585, 357–362 (2020). DOI: 10.1038/s41586-020-2649-2. (Publisher link).

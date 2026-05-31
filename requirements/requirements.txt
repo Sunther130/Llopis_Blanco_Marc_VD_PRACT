@@ -1,0 +1,8 @@
+numpy
+pandas
+dash
+matplotlib
+joblib
+pyarrow
+fastparquet
+dash-bootstrap-components

@@ -1,4 +1,4 @@
-"""Mòdul per a la neteja i preprocesat de les dades del dataset de Steam."""
+"""Mòdul per a la neteja i preprocessament de les dades del dataset de Steam."""
 
 
 import re
@@ -24,7 +24,7 @@ def convert_numeric_columns(steam_df: pd.DataFrame) -> pd.DataFrame:
     numeric_cols = ['Price', 'Peak CCU', 'Positive', 'Negative', 'User score', 
                     'Metacritic score', 'Recommendations', 'Average playtime forever',
                     'Median playtime forever', 'Average playtime two weeks', 
-                    'Median playtime two weeks', 'Achievements', 'DLC count']
+                    'Median playtime two weeks']
 
     for col in numeric_cols:
         steam_df[col] = pd.to_numeric(steam_df[col], errors='coerce')

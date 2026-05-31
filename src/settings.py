@@ -42,5 +42,5 @@ DIVIDER = {"borderColor": "#B8B8B8", "margin": "0 auto 0", "maxWidth": "860px"}
 
 
 TEMPLATE = 'plotly_white'
-DATASET_PATH = Path('../data/steam_dataset.csv')
-DATASET_PARQUET_PATH = Path('../data/steam_clean.parquet')
+DATASET_PATH = Path('data/steam_dataset.csv')
+DATASET_PARQUET_PATH = Path('data/steam_clean.parquet')

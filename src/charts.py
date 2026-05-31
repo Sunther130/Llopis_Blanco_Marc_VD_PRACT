@@ -226,7 +226,7 @@ def build_price_scatter(
         },
         labels={
             "Price": x_label,
-            "Satisfaction_ratio": "Ràtio de satisfacció",
+            "Satisfaction_ratio": "Rati de satisfacció",
             "Genre_focus": "Gènere",
         },
         category_orders={"Genre_focus": top_genre_names},
@@ -323,9 +323,9 @@ def build_ccu_scatter(
     df = _filter_top_selling_genres(df, top_genre_cols, "Genre_focus")
 
     x_label = (
-        "Nombre usuaris concurrents (escala log)"
+        "Nombre d'usuaris concurrents (escala log)"
         if log_x
-        else "Nombre usuaris concurrents (escala lineal)"
+        else "Nombre d'usuaris concurrents (escala lineal)"
     )
     fig = px.scatter(
         df,
@@ -376,7 +376,7 @@ def build_ccu_scatter(
                         args=[
                             {
                                 "xaxis.type": "log",
-                                "xaxis.title.text": "Nombre usuaris concurrents (escala log)",
+                                "xaxis.title.text": "Nombre d'usuaris concurrents (escala log)",
                                 "xaxis.autorange": True,
                             }
                         ],
@@ -387,7 +387,7 @@ def build_ccu_scatter(
                         args=[
                             {
                                 "xaxis.type": "linear",
-                                "xaxis.title.text": "Nombre usuaris concurrents (escala lineal)",
+                                "xaxis.title.text": "Nombre d'usuaris concurrents (escala lineal)",
                                 "xaxis.autorange": True,
                             }
                         ],
@@ -449,9 +449,9 @@ def build_profile_scatter(
 
     df["Profile"] = df.apply(classify, axis=1)
     x_label = (
-        "Nombre usuaris concurrents (escala log)"
+        "Nombre d'usuaris concurrents (escala log)"
         if log_x
-        else "Nombre usuaris concurrents (escala lineal)"
+        else "Nombre d'usuaris concurrents (escala lineal)"
     )
     fig = px.scatter(
         df,
@@ -498,7 +498,7 @@ def build_profile_scatter(
                         args=[
                             {
                                 "xaxis.type": "log",
-                                "xaxis.title.text": "Nombre usuaris concurrents (escala log)",
+                                "xaxis.title.text": "Nombre d'usuaris concurrents (escala log)",
                                 "xaxis.autorange": True,
                             }
                         ],
@@ -509,7 +509,7 @@ def build_profile_scatter(
                         args=[
                             {
                                 "xaxis.type": "linear",
-                                "xaxis.title.text": "Nombre usuaris concurrents (escala lineal)",
+                                "xaxis.title.text": "Nombre d'usuaris concurrents (escala lineal)",
                                 "xaxis.autorange": True,
                             }
                         ],
