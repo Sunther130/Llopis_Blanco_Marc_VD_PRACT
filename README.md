@@ -23,12 +23,14 @@ El projecte es divideix en les següents parts:
 │   ├── steam_dataset.csv     # Dataset reduït amb les dades de Steam
 │   ├── steam_dataset_2.csv   # Dataset original amb les dades de Steam
 │   └── steam_clean.parquet   # Dataset net i preparat
+├── requirements/
+│   └── requirements.txt      # Fitxer amb les dependències del projecte
 └── src/
-	├── __init__.py           # Marca el directori com a paquet Python
-	├── charts.py             # Funcions que construeixen els gràfics Plotly
-	├── clean.py              # Neteja, transformació i enriquiment del dataset
-	├── main.py               # Punt d'entrada de l'aplicació Dash
-	└── settings.py           # Constants visuals, textos i rutes globals
+	├── __init__.py            # Marca el directori com a paquet Python
+	├── charts.py              # Funcions que construeixen els gràfics Plotly
+	├── clean.py               # Neteja, transformació i enriquiment del dataset
+	├── main.py                # Punt d'entrada de l'aplicació Dash
+	└── settings.py            # Constants visuals, textos i rutes globals
 ```
 
 
@@ -64,36 +66,6 @@ Per a poder executar el notebook de la pràctica, és necessari seguir els segü
    ```bash
    deactivate
    ```
-
-
-## Pujar fitxers grans a GitHub
-
-1. Instalar Git LFS:
-   ```bash
-   git lfs install
-   ```
-
-2. Configurar Git LFS per a desactivar la verificació de bloqueig:
-   ```bash
-   git config --local lfs.locksverify false
-   ```
-
-3. Afegir regex dels fitxers grans a Git LFS:
-   ```bash
-   git lfs track "steam_dataset_2.csv"
-   ```
-
-4. Comprovar l'estat de Git LFS:
-   ```bash
-   git lfs ls-files
-   ```
-
-5. Desinstal·lar Git LFS:
-   ```bash
-   git lfs uninstall
-   ```
-
-6. Push a origen.
 
 
 ## Referències

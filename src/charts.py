@@ -18,16 +18,16 @@ from settings import (
 
 LIGHT_TREEMAP_SCALE = [[0, '#f3f8fc'], [0.35, '#dce8f5'], [0.7, '#aed6f1'], [1, '#66a9d0']]
 TOP_GENRE_COLORS = [
-    "#1a88c9",
-    "#2e86c1",
-    "#27ae60",
-    "#d4ac0d",
-    "#e67e22",
-    "#16a085",
-    "#c0392b",
-    "#7f8c8d",
-    "#8e5ea2",
-    "#34495e",
+    "#00a2ff",  # Action
+    "#ff0000",  # Indie
+    "#00cd55",  # Adventure
+    "#ffb300",  # RPG
+    "#c96ab1",  # Casual
+    "#6dd400",  # Simulation
+    "#0019fc",  # Strategy
+    "#8b4513",  # Massively
+    "#b300ff",  # Sports
+    "#000000",  # Racing
 ]
 
 
@@ -105,32 +105,6 @@ def _apply_light_treemap_theme(fig):
     return _apply_custom_theme(fig)
 
 
-def build_os_bar(steam_df: pd.DataFrame):
-    compat = (
-        steam_df[["Windows", "Mac", "Linux"]]
-        .replace({True: 1, False: 0})
-        .mean()
-        .mul(100)
-    )
-    fig = px.bar(
-        x=compat.index,
-        y=compat.values,
-        color=compat.index,
-        color_discrete_map={"Windows": "#0078D7", "Mac": "#6c757d", "Linux": "#E95420"},
-        labels={"x": "Sistema operatiu", "y": "% de jocs compatibles"},
-        title="Compatibilitat tècnica del catàleg",
-        text=[f"{v:.1f}%" for v in compat.values],
-    )
-    fig.update_traces(textposition="outside")
-    fig.update_layout(
-        template=TEMPLATE,
-        showlegend=False,
-        yaxis=dict(range=[0, 115]),
-        height=420,
-    )
-    return _apply_custom_theme(fig)
-
-
 def build_genre_count_treemap(
         steam_df: pd.DataFrame,
         genre_cols: list,
@@ -183,7 +157,6 @@ def build_genre_sales_treemap(
 def build_price_scatter(
         steam_df: pd.DataFrame,
         genre_cols: list,
-        log_x: bool = True,
         threshold: int = 2000,
         sample_size: int = 200):
     df = steam_df[
@@ -205,15 +178,13 @@ def build_price_scatter(
         df = pd.concat(dfs).reset_index(drop=True)
     df["Bubble_size"] = np.sqrt(df["Total_reviews"].clip(lower=1))
 
-    x_label = "Preu $ (escala log)" if log_x else "Preu $ (escala lineal)"
     fig = px.scatter(
         df,
         x="Price",
         y="Satisfaction_ratio",
         color="Genre_focus",
-        size="Bubble_size",
         size_max=16,
-        log_x=log_x,
+        log_x=False,
         opacity=SCATTER_OPACITY_CIRCLE,
         render_mode="webgl",
         hover_name="Name",
@@ -225,7 +196,7 @@ def build_price_scatter(
             "Bubble_size": False,
         },
         labels={
-            "Price": x_label,
+            "Price": "Preu $",
             "Satisfaction_ratio": "Rati de satisfacció",
             "Genre_focus": "Gènere",
         },
@@ -237,74 +208,13 @@ def build_price_scatter(
     )
     fig.update_traces(marker=dict(line=dict(width=0)))
 
-    log_range = [np.log10(df["Price"].min()) - 0.1, np.log10(100)]
-    xaxis_cfg = dict(gridcolor="rgba(0,0,0,0.06)")
-    if log_x:
-        xaxis_cfg.update(type="log", range=log_range)
-
     fig.update_layout(
         template=TEMPLATE,
         height=600,
         legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02),
-        margin=dict(t=100, r=30, b=110, l=40),
-        xaxis=xaxis_cfg,
+        margin=dict(t=100, r=30, b=60, l=40),
+        xaxis=dict(gridcolor="rgba(0,0,0,0.06)"),
         yaxis=dict(range=[0, 1], gridcolor="rgba(0,0,0,0.06)", tickformat=".0%"),
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="left",
-                active=0 if log_x else 1,
-                buttons=[
-                    dict(
-                        label=TAG_SCALE_LOGARITMICA,
-                        method="relayout",
-                        args=[
-                            {
-                                "xaxis.type": "log",
-                                "xaxis.title.text": "Preu ($, escala log)",
-                                "xaxis.range": log_range,
-                                "xaxis.autorange": False,
-                            }
-                        ],
-                    ),
-                    dict(
-                        label=TAG_SCALE_LINEAL,
-                        method="relayout",
-                        args=[
-                            {
-                                "xaxis.type": "linear",
-                                "xaxis.title.text": "Preu ($, escala lineal)",
-                                "xaxis.range": None,
-                                "xaxis.autorange": True,
-                            }
-                        ],
-                    ),
-                ],
-                showactive=True,
-                x=1,
-                xanchor="right",
-                y=-0.2,
-                yanchor="middle",
-                bgcolor="rgba(255,255,255,0.92)",
-                bordercolor="rgba(0,0,0,0.08)",
-                borderwidth=1,
-                font=CHART_FONT,
-                pad=dict(r=4, t=0, b=0, l=4),
-            )
-        ],
-        annotations=[
-            dict(
-                text="",
-                x=0.68,
-                xref="paper",
-                y=-0.2,
-                yref="paper",
-                showarrow=False,
-                xanchor="right",
-                yanchor="middle",
-                font=CHART_FONT,
-            )
-        ],
     )
     fig.add_hrect(y0=0.80, y1=1.0, fillcolor=SCATTER_FILLCOLOR, opacity=HRECT_SCATTER_OPACITY)
 
@@ -405,19 +315,6 @@ def build_ccu_scatter(
                 pad=dict(r=4, t=0, b=0, l=4),
             )
         ],
-        annotations=[
-            dict(
-                text="",
-                x=0.68,
-                xref="paper",
-                y=-0.2,
-                yref="paper",
-                showarrow=False,
-                xanchor="right",
-                yanchor="middle",
-                font=CHART_FONT,
-            )
-        ],
     )
     return _apply_custom_theme(_apply_top_genre_palette(fig, palette))
 
@@ -467,7 +364,7 @@ def build_profile_scatter(
         },
         log_x=log_x,
         opacity=0.6,
-        title="Mapa de perfils segons visibilitat i satisfacció",
+        title="Mapa de perfils segons recepció",
         labels={
             "Peak CCU": x_label,
             "Satisfaction_ratio": "Rati de satisfacció",
@@ -527,18 +424,99 @@ def build_profile_scatter(
                 pad=dict(r=4, t=0, b=0, l=4),
             )
         ],
-        annotations=[
+    )
+    return _apply_custom_theme(fig), df
+
+
+def build_retention_scatter(
+        steam_df: pd.DataFrame,
+        min_playtime: int = 60,
+        log_x: bool = True):
+    df = steam_df[
+        (steam_df["Average playtime forever"] > min_playtime)
+        & (steam_df["Median playtime forever"] > 0)
+        & (steam_df["Average playtime two weeks"].notna())
+    ].copy()
+
+    x_label = (
+        "Intensitat d'ús total (min, escala log)"
+        if log_x
+        else "Intensitat d'ús total (min, escala lineal)"
+    )
+    fig = px.scatter(
+        df,
+        x="Average playtime forever",
+        y="Retention_ratio",
+        color="Skewness",
+        color_continuous_scale="Blues",
+        opacity=0.55,
+        log_x=log_x,
+        hover_name="Name",
+        hover_data={
+            "Average playtime forever": ":,.0f",
+            "Retention_ratio": ":.1%",
+            "Skewness": ":.1f",
+            "Median playtime forever": ":,.0f",
+        },
+        labels={
+            "Average playtime forever": x_label,
+            "Retention_ratio": "Rati de retenció recent",
+            "Skewness": "",
+        },
+        title="Patrons de retenció i intensitat d'ús",
+    )
+
+    fig.add_hline(y=0.5, line_dash="dot", line_color="grey", opacity=0.5)
+    fig.add_vline(
+        x=df["Average playtime forever"].median(),
+        line_dash="dot", line_color="grey", opacity=0.5,
+    )
+
+    fig.update_layout(
+        template=TEMPLATE,
+        height=600,
+        margin=dict(t=100, r=30, b=110, l=40),
+        yaxis=dict(tickformat=".0%", range=[0, 1.05]),
+        updatemenus=[
             dict(
-                text="",
-                x=0.68,
-                xref="paper",
-                y=-0.2,
-                yref="paper",
-                showarrow=False,
+                type="buttons",
+                direction="left",
+                active=0 if log_x else 1,
+                buttons=[
+                    dict(
+                        label=TAG_SCALE_LOGARITMICA,
+                        method="relayout",
+                        args=[
+                            {
+                                "xaxis.type": "log",
+                                "xaxis.title.text": "Intensitat d'ús total (min, escala log)",
+                                "xaxis.autorange": True,
+                            }
+                        ],
+                    ),
+                    dict(
+                        label=TAG_SCALE_LINEAL,
+                        method="relayout",
+                        args=[
+                            {
+                                "xaxis.type": "linear",
+                                "xaxis.title.text": "Intensitat d'ús total (min, escala lineal)",
+                                "xaxis.autorange": True,
+                            }
+                        ],
+                    ),
+                ],
+                showactive=True,
+                x=1,
                 xanchor="right",
+                y=-0.2,
                 yanchor="middle",
+                bgcolor="rgba(255,255,255,0.92)",
+                bordercolor="rgba(0,0,0,0.08)",
+                borderwidth=1,
                 font=CHART_FONT,
+                pad=dict(r=4, t=0, b=0, l=4),
             )
         ],
     )
-    return _apply_custom_theme(fig), df
+    return _apply_custom_theme(fig)

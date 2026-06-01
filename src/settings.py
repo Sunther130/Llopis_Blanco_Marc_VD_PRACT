@@ -38,7 +38,7 @@ TEXT_FONT = {
 }
 
 SECTION = {"padding": "48px 24px"}
-DIVIDER = {"borderColor": "#B8B8B8", "margin": "0 auto 0", "maxWidth": "860px"}
+DIVIDER = {"borderColor": "#B8B8B8", "margin": "0 auto", "maxWidth": "860px"}
 
 
 TEMPLATE = 'plotly_white'

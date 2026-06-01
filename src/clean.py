@@ -13,8 +13,8 @@ def clean_release_dates(steam_df: pd.DataFrame) -> pd.DataFrame:
     steam_df['Release date'] = pd.to_datetime(steam_df['Release date'], format='mixed', errors='coerce')
     steam_df['Release_year'] = steam_df['Release date'].dt.year
 
-    # Filtrar anys raonables (Steam va néixer el 2003)
-    steam_df = steam_df[(steam_df['Release_year'] >= 2003)]
+    # Filtrar anys raonables (es descarten registres anteriors al 2014 per baixa fiabilitat de dades)
+    steam_df = steam_df[(steam_df['Release_year'] >= 2014)]
 
     return steam_df
 
@@ -60,7 +60,7 @@ def estimate_owners_midpoint(steam_df: pd.DataFrame) -> pd.DataFrame:
         try:
             parts = str(x).replace(',', '').split(' - ')
             return (int(parts[0]) + int(parts[1])) / 2
-        except:
+        except (ValueError, IndexError, AttributeError):
             return np.nan
 
     steam_df['Owners_mid'] = steam_df['Estimated owners'].apply(parse_owners)
@@ -73,20 +73,8 @@ def create_derived_metrics(steam_df: pd.DataFrame) -> pd.DataFrame:
     steam_df['Total_reviews'] = steam_df['Positive'] + steam_df['Negative']
     steam_df['Satisfaction_ratio'] = steam_df['Positive'] / steam_df['Total_reviews']
     steam_df['Satisfaction_ratio'] = steam_df['Satisfaction_ratio'].replace([np.inf, -np.inf], np.nan)
-
-    # Relació entre temps mitjà i mediana: si mitjana >> mediana, hi ha jugadors molt hardcore
-    steam_df['Retention_index'] = np.where(
-        steam_df['Median playtime forever'] > 0,
-        steam_df['Average playtime forever'] / steam_df['Median playtime forever'],
-        np.nan
-    )
-
-    bins =   [     0,   0.01,       5,       15,       30,       50,     70,   np.inf]
-    labels = ['Free', '$0.-5', '$5-15', '$15-30', '$30-50', '$50-$70', '$70+']
-    steam_df['Price_tier'] = pd.cut(steam_df['Price'], bins=bins, labels=labels, include_lowest=True)
-
-    steam_df['Decade'] = (steam_df['Release_year'] // 5 * 5).astype(str) + 's'
-
+    steam_df["Retention_ratio"] = (steam_df["Average playtime two weeks"] / steam_df["Average playtime forever"]).clip(0, 1)
+    steam_df["Skewness"] = (steam_df["Average playtime forever"] / steam_df["Median playtime forever"]).clip(1, 20)
 
     return steam_df
 

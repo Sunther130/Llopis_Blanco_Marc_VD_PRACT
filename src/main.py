@@ -20,12 +20,11 @@ from settings import (
 from clean import preprocess_data
 
 from charts import (
-    build_os_bar,
     build_genre_count_treemap,
     build_genre_sales_treemap,
     build_price_scatter,
-    build_ccu_scatter,
     build_profile_scatter,
+    build_retention_scatter,
 )
 
 
@@ -42,7 +41,6 @@ if not DATASET_PARQUET_PATH.exists():
 ################
 steam_df = pd.read_parquet(DATASET_PARQUET_PATH)
 genre_cols = [c for c in steam_df.columns if c.startswith("Genre_")]
-genres = steam_df.columns[steam_df.columns.str.startswith("Genre_")]
 
 # Pre-compute genre_principal once
 genre_sums = steam_df[genre_cols].sum()
@@ -62,16 +60,15 @@ steam_df["Genre_principal"] = steam_df[genre_cols].apply(
 ##############################
 # Pre-compute static figures #
 ##############################
-fig_os = build_os_bar(steam_df)
 fig_genre_count = build_genre_count_treemap(steam_df, genre_cols)
 fig_genre_sales = build_genre_sales_treemap(steam_df, genre_cols)
 fig_price = build_price_scatter(steam_df, genre_cols)
-fig_ccu = build_ccu_scatter(steam_df, genre_cols)
+fig_retention = build_retention_scatter(steam_df)
 
 n_games = f"{steam_df.shape[0]:,}"
 year_min = int(steam_df["Release_year"].min())
 year_max = int(steam_df["Release_year"].max())
-n_genres = len(genres)
+n_genres = len(genre_cols)
 price_min = steam_df["Price"].min()
 price_max = steam_df["Price"].max()
 
@@ -223,6 +220,9 @@ app.layout = dbc.Container(
                         "Culturalment, les persones associen sovint un preu elevat amb una qualitat superior. "
                         "Per tal de verificar si aquesta associació es manté en el cas dels videojocs de Steam, "
                         "es pot examinar la relació entre el preu i la satisfacció dels usuaris de cadascun dels registres del dataset. "
+                        "Entenen per satisfacció el percentatge de ressenyes positives que ha rebut cada joc respecte del total.",
+                        html.Br(),
+                        html.Br(),
                         "Si existís tal relació de manera sistemàtica, el núvol de punts mostraria una "
                         "tendència ascendent o descendent clara. ",
                         html.Br(),
@@ -232,8 +232,9 @@ app.layout = dbc.Container(
                         "una relació lineal consistent entre el preu i la satisfacció dels usuaris.",
                         html.Br(),
                         html.Br(),
-                        "A més, el mateix gràfic incorpora un selector per alternar entre l'escala "
-                        "logarítmica i la lineal i facilitar-ne la lectura.",
+                        "El que sí apareix és una concentració en els valors més baixos. Tot i que recordem que el gènere Indie "
+                        "és el més abundant, i aquest sol tenir un preu relativament baix. Per tant, és normal veure que hi ha molts punts "
+                        "en aquesta zona.",
                     ],
                     style={**TEXT_FONT},
                 ),
@@ -241,64 +242,37 @@ app.layout = dbc.Container(
             ],
         ),
         html.Hr(style=DIVIDER),
-        #######################
-        # PEAK CCU vs SATISFACTION #
-        #######################
+        ###############
+        # PROFILE MAP #
+        ###############
         html.Div(
             style=SECTION,
             children=[
                 html.P(
                     [
-                        "Donat que un gran nombre de jugadors actius simultàniament pot ser un indicador de popularitat i visibilitat, "
-                        "sembla lògic pensar en intentar plasmar aquesta relació en un gràfic. S'ha considerat que la millor manera de "
-                        "fer-ho és mitjançant un núvol de punts on l'eix X representaria el nombre màxim de jugadors actius simultàniament, "
-                        "corresponent a la variable Peak CCU i l'eix Y el percentatge de valoracions positives sobre el total, corresponent "
-                        "a la variable Satisfaction ratio. A més, el tamany de cada cercle representa el nombre total de recomanacions que ha "
-                        "rebut el joc. Com més gran el cercle, més recomanacions ha rebut.",
+                        "Si el preu no explica la satisfacció, potser ho fa la popularitat. Un gran nombre de jugadors actius simultàniament "
+                        "és un dels indicadors de visibilitat més directes de la plataforma. Tanmateix, tampoc aquí s'observa una relació simple. "
+                        "Hi ha títols amb pics altíssims de jugadors que no han obtingut una satisfacció especialment alta, i viceversa.",
                         html.Br(),
                         html.Br(),
-                        "Aquí observem que hi ha pics alts de nombre de jugadors en diversos jocs però que no tots han presentat una alta satisfacció "
-                        "per moltes recomanacions que hagin tingut o nombre de jugadors simultanis. A mesura que augmenta el nombre de jugadors actius, "
-                        "sí que es denota que els jugadors recomanen el joc cada cop més, però no sembla que hi hagi una relació directa. S'observen alguns "
-                        "casos en què la recomanació i el nombre de jugadors mostren una associació, però també d'altres com ",
-                        html.Strong("PUBG", style={"color": ACCENT}),
-                        " que té molts jugadors però poca satisfacció i ",
-                        html.Strong("DELTARUNE", style={"color": ACCENT}),
-                        " que té poca recomanació però molts jugadors satisfets."
-                    ],
-                    style={**TEXT_FONT},
-                ),
-                dcc.Graph(id="ccu-scatter", figure=fig_ccu),
-            ],
-        ),
-        html.Hr(style=DIVIDER),
-        # ── PROFILE MAP ─────────────────────────────────────────────────────
-        html.Div(
-            style=SECTION,
-            children=[
-                html.P(
-                    [
-                        "Ja per acabar, si s'analitzen conjuntament la satisfacció i la popularitat, és possible classificar els "
-                        "jocs en diferents perfils que identifiquen el seu rendiment més enllà de la seva popularitat.",
+                        "El que sí permet aquest eix és construir perfils d'acollida que categoritzen els videojocs segons la seva posició "
+                        "en l'espai, distingint entre: ",
+                        html.Ul(
+                            [
+                                html.Li([html.Strong("Decebedor: "), "jocs amb baix volum de jugadors i baixa satisfacció."]),
+                                html.Li([html.Strong("Mainstream: "), "jocs amb un volum de jugadors i valoracions moderades sense destacar especialment."]),
+                                html.Li([html.Strong("Blockbuster: "), "jocs que han funcionat molt bé tant en termes de popularitat com de satisfacció."]),
+                                html.Li([html.Strong("Hidden Gem: "), "jocs que tenen una alta satisfacció però no han arribat a ser molt coneguts."]),
+                                html.Li([html.Strong("Polaritzat: "), "jocs amb gran volum de jugadors però baixa satisfacció."]),
+                            ],
+                            style={"marginTop": "8px", "paddingLeft": "20px"},
+                        ),
+                        html.Br(),
+                        "De forma clara es visualitzen aquells jocs que han aconseguit destacar respecte la resta i aquells que, "
+                        "tot i ser bons, ho podrien haver fet millor.",
                         html.Br(),
                         html.Br(),
-                        "Aquests perfils són:",
-                        html.Br(),
-                        "- Blockbuster: jocs que han funcionat molt bé tant en termes de popularitat com de satisfacció.",
-                        html.Br(),
-                        "- Hidden Gem: jocs que tenen una alta satisfacció però no han arribat a ser molt coneguts.",
-                        html.Br(),
-                        "- Mainstream: jocs amb un volum de jugadors i valoracions moderades sense destacar especialment.",
-                        html.Br(),
-                        "- Decebedor: jocs amb gran volum de jugadors però baixa satisfacció.",
-                        html.Br(),
-                        html.Br(),
-                        "De forma clara es visualitzen aquells jocs que han aconseguit destacar respecte la resta i aquells que"
-                        ", tot i ser bons, ho podrien haver fet millor.",
-                        html.Br(),
-                        html.Br(),
-                        "Els filtres permeten observar com varia aquesta "
-                        "distribució segons el llindar de visibilitat i el volum de ressenyes.",
+                        "Exploreu com canvia el mapa ajustant els llindars de jugadors i ressenyes.",
                     ],
                     style={**TEXT_FONT},
                 ),
@@ -342,7 +316,61 @@ app.layout = dbc.Container(
             ],
         ),
         html.Hr(style=DIVIDER),
-        # ── CONCLUSIONS ──────────────────────────────────────────────────────
+        #########################
+        # RETENTION & INTENSITY #
+        #########################
+        html.Div(
+            style=SECTION,
+            children=[
+                html.P(
+                    [
+                        "Fins i tot, podem anar més enllà i analitzar la retenció dels jugadors. "
+                        "Quants segueixen jugant activament un joc després d'haver-hi invertit temps? Comparant "
+                        "el temps de joc recent (dues setmanes) amb el temps total acumulat, aconseguim generar un "
+                        "rati de retenció.",
+                        html.Br(),
+                        html.Br(),
+                        "Resultant en una taula de dispersió que forma 4 quadrants delimitats per una línia discontínua "
+                        "segons la seva intensitat d'ús i la seva capacitat de retenció: ",
+                        html.Ul(
+                            [
+                                html.Li(
+                                    [html.Strong("Quadrant superior dret: "),
+                                     "jocs amb alta retenció i alta intensitat d'ús, indicant títols que mantenen els "
+                                     "jugadors compromesos a llarg termini."]),
+                                html.Li(
+                                    [html.Strong("Quadrant superior esquerre: "),
+                                     "jocs amb alta retenció però baixa intensitat d'ús, indicant títols que mantenen "
+                                     "els jugadors compromesos però amb sessions de joc més curtes."]),
+                                html.Li(
+                                    [html.Strong("Quadrant inferior dret: "),
+                                     "jocs amb baixa retenció però alta intensitat d'ús, indicant títols que atrauen jugadors "
+                                     "intensament però no els mantenen a llarg termini."]),
+                                html.Li(
+                                    [html.Strong("Quadrant inferior esquerre: "),
+                                     "jocs amb baixa retenció i baixa intensitat d'ús, indicant títols que no aconsegueixen "
+                                     "mantenir els jugadors compromesos."]),
+                            ],
+                            style={"marginTop": "8px", "paddingLeft": "20px"},
+                        ),
+                        html.Br(),
+                        "A més, el color codifica l'asimetria entre la mitjana i la mediana del temps de joc on cada número en l'escala és quantes vegades "
+                        "la mitjana supera la mediana. "
+                        "Valors alts (blau fosc) indiquen que uns pocs jugadors juguen molt més que la "
+                        "majoria, mentre que valors baixos (blau clar) suggereixen un ús més distribuït. D'aquesta manera, els foscos "
+                        "poden indicar títols que, tot i tenir una alta intensitat d'ús, depenen d'una base de jugadors molt reduïda que hi "
+                        "inverteix molt de temps, mentre que els clars poden suggerir títols amb un ús més generalitzat entre la seva "
+                        "comunitat de jugadors.",
+                    ],
+                    style={**TEXT_FONT},
+                ),
+                dcc.Graph(figure=fig_retention),
+            ],
+        ),
+        html.Hr(style=DIVIDER),
+        ###############
+        # CONCLUSIONS #
+        ###############
         html.Div(
             style={**SECTION, "textAlign": "center"},
             children=[
@@ -359,8 +387,9 @@ app.layout = dbc.Container(
                                 ),
                                 conclusion_card(
                                     "Pes dels gèneres",
-                                    "El gènere Indie concentra el major volum de títols, mentre que Action i RPG "
-                                    "destaquen en indicadors vinculats a la implicació dels usuaris i a la recomanació.",
+                                    "El gènere Indie concentra el major volum de títols publicats, mentre que Action "
+                                    "s'imposa com el gènere líder en vendes estimades, malgrat tenir un volum "
+                                    "d'oferta inferior al d'Indie.",
                                 ),
                             ],
                             md=5,
@@ -373,12 +402,34 @@ app.layout = dbc.Container(
                                     "fet que apunta a una relació imperfecta entre abast massiu i valoració.",
                                 ),
                                 conclusion_card(
-                                    "Títols infrarepresentats",
-                                    "L'anàlisi també permet identificar jocs amb una recepció molt positiva però amb una visibilitat comparativament limitada.",
+                                    "Retenció i intensitat d'ús",
+                                    "La majoria de títols s'agrupen en el quadrant inferior dret, amb baixa retenció recent "
+                                    "i un ús total moderat. Només un conjunt reduït de jocs aconsegueix combinar una alta "
+                                    "intensitat acumulada amb un rati de retenció elevat.",
                                 ),
                             ],
                             md=5,
                         ),
+                    ],
+                ),
+                dbc.Row(
+                    justify="center",
+                    style={"marginTop": "32px"},
+                    children=[
+                        dbc.Col(
+                            html.P(
+                                [
+                                    "En conjunt, cap factor aïllat determina l'èxit d'un joc a Steam. "
+                                    "El gènere condiciona el volum d'oferta i de vendes, però no garanteix qualitat. "
+                                    "El preu és irrellevant com a predictor de satisfacció. "
+                                    "La popularitat pot coexistir amb valoracions baixes. "
+                                    "I la retenció, la capacitat de mantenir els jugadors compromesos al llarg del temps, "
+                                    "és potser l'indicador més honest de si un joc ha aconseguit realment el seu objectiu.",
+                                ],
+                                style={**TEXT_FONT, "textAlign": "center", "fontStyle": "italic"},
+                            ),
+                            md=8,
+                        )
                     ],
                 ),
             ],
